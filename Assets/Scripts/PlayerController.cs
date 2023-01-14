@@ -23,9 +23,9 @@ public class PlayerController : NetworkBehaviour
             
             if (playerPlane.Raycast(ray, out float hitDist))
             {
-                Vector3 targetPoint = ray.GetPoint(hitDist);
-                Vector3 moveDir = (targetPoint - transform.position).normalized;
-                transform.position += moveDir * speed * Time.deltaTime;
+                var targetPoint = ray.GetPoint(hitDist);
+                var moveDir = (targetPoint - transform.position).normalized;
+                transform.position += moveDir * (speed * Time.deltaTime);
                 transform.LookAt(targetPoint);
             }
         }
