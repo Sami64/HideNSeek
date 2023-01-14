@@ -80,19 +80,22 @@ public class LobbyManager : NetworkBehaviour
          try
          {
              _currentLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(codeInputField.text);
-             var a = await RelayService.Instance.JoinAllocationAsync(_currentLobby.LobbyCode);
+             var a = await RelayService.Instance.JoinAllocationAsync(_currentLobby.Data["relayJoinKey"].Value);
+             _unityTransport.SetClientRelayData(a.RelayServer.IpV4, (ushort)a.RelayServer.Port,a.AllocationIdBytes,a.Key,a.ConnectionData,a.HostConnectionData);
+             
+             PeriodicallyRefreshLobby();
              
              lobbyPanel.gameObject.SetActive(false);
              roomPanel.InitRoom(_currentLobby);
              roomPanel.gameObject.SetActive(true);
+
              
-             PeriodicallyRefreshLobby();
 
              NetworkManager.Singleton.StartClient();
          }
          catch (Exception e)
          {
-             Debug.Log("Cant join");
+             Debug.LogError($"Cant join {e.Message}");
          }
          
      }
@@ -111,21 +114,26 @@ public class LobbyManager : NetworkBehaviour
      {
          try
          {
+             
+             
+             var a = await RelayService.Instance.CreateAllocationAsync(lobbyData.MaxPlayers);
+             var joinKey = await RelayService.Instance.GetJoinCodeAsync(a.AllocationId);
+             
              var options = new CreateLobbyOptions
              {
                  Data = new Dictionary<string, DataObject>()
                  {
-                     {"roomName", new DataObject(DataObject.VisibilityOptions.Member, lobbyData.Name)}
+                     {"roomName", new DataObject(DataObject.VisibilityOptions.Member, lobbyData.Name)},
+                     {"relayJoinKey", new DataObject(DataObject.VisibilityOptions.Member, joinKey)}
                  }
 
              };
              
-             var a = await RelayService.Instance.CreateAllocationAsync(lobbyData.MaxPlayers);
              _currentLobby = await Lobbies.Instance.CreateLobbyAsync(lobbyData.Name, lobbyData.MaxPlayers, options);
 
              _unityTransport.SetHostRelayData(a.RelayServer.IpV4, (ushort)a.RelayServer.Port, a.AllocationIdBytes, a.Key, a.ConnectionData);
              
-             StartCoroutine(LobbyHeartbeat(_currentLobby.Id, 24));
+             StartCoroutine(LobbyHeartbeat(_currentLobby.Id, 15));
              PeriodicallyRefreshLobby();
              
              lobbyPanel.gameObject.SetActive(false);

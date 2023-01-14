@@ -62,7 +62,7 @@ public class RoomPanel : MonoBehaviour
          
              // Destroy Panels?
              var inactivePanels = _playerPanels.Where(p => !playerKeys.Contains(p.PlayerId)).ToList();
-             foreach (var panel in _playerPanels)
+             foreach (var panel in inactivePanels)
              {
                  _playerPanels.Remove(panel);
                  Destroy(panel.gameObject);
