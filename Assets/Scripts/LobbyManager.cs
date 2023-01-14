@@ -219,6 +219,11 @@ public class LobbyManager : NetworkBehaviour
              
              UpdateRoomUI();
          }
+         else
+         {
+             roomPanel.gameObject.SetActive(false);
+             lobbyPanel.gameObject.SetActive(true);
+         }
      }
 
      [ClientRpc]
@@ -253,6 +258,8 @@ public class LobbyManager : NetworkBehaviour
          base.OnDestroy();
          LobbyPanel.LobbyCreated -= CreateGame;
          LobbyPanel.LobbyJoined -= JoinGame;
+
+         RoomPanel.StartPressed -= OnGameStart;
 
          if (NetworkManager.Singleton != null)
          {
