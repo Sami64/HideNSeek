@@ -14,7 +14,7 @@ public class LobbyPanel : MonoBehaviour
         var lobbyData = new LobbyData
         {
             Name = $"User#{PlayerPrefs.GetString("UserId").Substring(0,5)}",
-            MaxPlayers = 3
+            MaxPlayers = 2
         };
         
         LobbyCreated?.Invoke(lobbyData);
